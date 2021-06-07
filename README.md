@@ -5,12 +5,14 @@ Ray integration with LSF enables users to start up a Ray cluster on LSF and run 
 # Configuring Conda 
 
 - Before you begin make sure you have conda install on your machine, details about installing conda on linux machine is [here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html).  
-- Sample conda env yml is present [here](https://github.com/IBMSpectrumComputing/ray-integration/tree/main/sample_conda_env), to create sample conda env that will run GPU and CPU workloads run:
+- For reference sample conda env yml is present [here](https://github.com/IBMSpectrumComputing/ray-integration/tree/main/sample_conda_env), to create sample conda env that will run GPU and CPU workloads run, it has mix of conda and pip dependencies:
   ```
-  conda env create -f sample_ray_env.yml
+  conda env create -f sample_conda_env/sample_ray_env.yml
   ```
 - To test if you have ray installed with version number run:
    ```
+    conda activate ray
+    pip install -U ray
     ray --version
     ```
  # Running ray as interactive LSF job
@@ -21,7 +23,7 @@ Ray integration with LSF enables users to start up a Ray cluster on LSF and run 
     ```
  - Start the script by running the following command:
     ```
-    ./ray_launch_cluster.sh -c "python cifar_pytorch_example.py --use-gpu --num_epochs 50" -n "ray" -m 20000000000
+    ./ray_launch_cluster.sh -c "python <full_path>/cifar_pytorch_example.py --use-gpu --num_epochs 5" -n "ray" -m 20000000000
     ```
     Where:  
         -c is the user command that needs to be scaled under ray  
@@ -31,7 +33,7 @@ Ray integration with LSF enables users to start up a Ray cluster on LSF and run 
  # Running ray as a batch job
  - Run the below command to run ray as batch job
     ```
-      bsub -o std%J.out -e std%J.out -n 32 -R "span[ptile=8] rusage[mem=4GB]" ./ray_launch_cluster.sh -c "python sample_code_for_ray.py" -n "ray"
+      bsub -o std%J.out -e std%J.out -M 20GB! -n 2 -R "span[ptile=1]" -gpu "num=2"  ./ray_launch_cluster.sh -c "python <full_path>/cifar_pytorch_example.py " -n "ray" -m 20000000000
     ```
  # Acessing ray dashboard in interactive job mode:
  - Get ray head node and dashboard port, please find below log lines on the console
