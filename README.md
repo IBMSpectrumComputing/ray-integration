@@ -24,7 +24,7 @@ Ray integration with LSF enables users to start up a Ray cluster on LSF and run 
  - Sample workloads are present in sample_workload directory, sample_code_for_ray.py is CPU only workload and cifar_pytorch_example.py will work on CPU as well as GPU.
  - Start the script by running the following command:
     ```
-    ./ray_launch_cluster.sh -c "python <full_path>/cifar_pytorch_example.py --use-gpu --num_epochs 5" -n "ray" -m 20000000000
+    ./ray_launch_cluster.sh -c "python <full_path_of_sample_workload>/cifar_pytorch_example.py --use-gpu --num_epochs 5" -n "ray" -m 20000000000
     ```
     Where:  
         -c is the user command that needs to be scaled under ray  
@@ -34,7 +34,7 @@ Ray integration with LSF enables users to start up a Ray cluster on LSF and run 
  # Running ray as a batch job
  - Run the below command to run ray as batch job
     ```
-      bsub -o std%J.out -e std%J.out -M 20GB! -n 2 -R "span[ptile=1]" -gpu "num=2"  ./ray_launch_cluster.sh -c "python <full_path>/cifar_pytorch_example.py " -n "ray" -m 20000000000
+      bsub -o std%J.out -e std%J.out -M 20GB! -n 2 -R "span[ptile=1]" -gpu "num=2"  ./ray_launch_cluster.sh -c "python <full_path_of_sample_workload>/cifar_pytorch_example.py " -n "ray" -m 20000000000
     ```
  # Acessing ray dashboard in interactive job mode:
  - Get ray head node and dashboard port, please find below log lines on the console
@@ -50,7 +50,7 @@ Ray integration with LSF enables users to start up a Ray cluster on LSF and run 
     ```
     export PORT=3752
     export HEAD_NODE=ccc2-10.sl.cloud.ibm.com
-    ssh -L $PORT:localhost:$PORT -N -f -l asmalvan $HEAD_NODE```
+    ssh -L $PORT:localhost:$PORT -N -f -l <username> $HEAD_NODE```
  - Access the dashboard at your laptop on:
     ```
       http://127.0.0.1:3752
