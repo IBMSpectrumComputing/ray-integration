@@ -31,11 +31,7 @@ Ray integration with LSF enables users to start up a Ray cluster on LSF and run 
         -n is the conda namespace that will be activate before the cluster is spawned  
         -m is object store memory size in bytes as required by ray  
  
- # Running ray as a batch job
- - Run the below command to run ray as batch job
-    ```
-      bsub -o std%J.out -e std%J.out -M 20GB! -n 2 -R "span[ptile=1]" -gpu "num=2"  ./ray_launch_cluster.sh -c "python <full_path_of_sample_workload>/cifar_pytorch_example.py " -n "ray" -m 20000000000
-    ```
+ 
  # Acessing ray dashboard in interactive job mode:
  - Get ray head node and dashboard port, please find below log lines on the console
     ```
@@ -57,3 +53,9 @@ Ray integration with LSF enables users to start up a Ray cluster on LSF and run 
       http://127.0.0.1:3752
     ```
         
+ # Running ray as a batch job
+ - Run the below command to run ray as batch job
+    ```
+      bsub -o std%J.out -e std%J.out -M 20GB! -n 2 -R "span[ptile=1]" -gpu "num=2"  ./ray_launch_cluster.sh -c "python <full_path_of_sample_workload>/cifar_pytorch_example.py " -n "ray" -m 20000000000
+    ```
+-  To access the dashboard please refer to log file generated for batch job and perform port forwarding referring to commands described above.
