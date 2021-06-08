@@ -50,7 +50,8 @@ Ray integration with LSF enables users to start up a Ray cluster on LSF and run 
     ```
     export PORT=3752
     export HEAD_NODE=ccc2-10.sl.cloud.ibm.com
-    ssh -L $PORT:localhost:$PORT -N -f -l <username> $HEAD_NODE```
+    ssh -L $PORT:localhost:$PORT -N -f -l <username> $HEAD_NODE
+    ```
  - Access the dashboard at your laptop on:
     ```
       http://127.0.0.1:3752
