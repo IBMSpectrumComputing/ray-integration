@@ -14,6 +14,7 @@ Ray integration with LSF enables users to start up a Ray cluster on LSF and run 
     conda activate ray
     pip install -U ray
     ray --version
+    ray, version 1.4.0
     ```
  # Running ray as interactive LSF job
  
