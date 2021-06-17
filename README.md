@@ -25,7 +25,7 @@ Ray integration with LSF enables users to start up a Ray cluster on LSF and run 
  - Sample workloads are present in sample_workload directory, sample_code_for_ray.py is CPU only workload and cifar_pytorch_example.py will work on CPU as well as GPU.
  - Start the script by running the following command:
     ```
-    ./ray_launch_cluster.sh -c "python <full_path_of_sample_workload>/cifar_pytorch_example.py --use-gpu --num_epochs 5" -n "ray" -m 20000000000
+    ./ray_launch_cluster.sh -c "python <full_path_of_sample_workload>/cifar_pytorch_example.py --use-gpu --num_epochs 5 --num-workers 4" -n "ray" -m 20000000000
     ```
     Where:  
         -c is the user command that needs to be scaled under ray  
