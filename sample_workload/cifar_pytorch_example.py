@@ -106,6 +106,8 @@ def train_cifar(test_mode=False,
         use_gpu=use_gpu,
         scheduler_step_freq="epoch",
         use_fp16=fp16,
+        #un-comment to use NCCL backend
+        #backend="nccl",
         use_tqdm=False)
     pbar = trange(num_epochs, unit="epoch")
     for i in pbar:
