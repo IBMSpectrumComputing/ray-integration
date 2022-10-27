@@ -8,7 +8,7 @@ function getfreeport()
     CHECK="do while"
     while [[ ! -z $CHECK ]]; do
         port=$(( ( RANDOM % 40000 )  + 20000 ))
-        CHECK=$(sudo netstat -ap | grep $port)
+        CHECK=$(netstat -a | grep $port)
     done
     echo $port
 }
