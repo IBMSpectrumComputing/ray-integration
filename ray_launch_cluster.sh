@@ -7,8 +7,8 @@ function getfreeport()
 {
     CHECK="do while"
     while [[ ! -z $CHECK ]]; do
-        port=$(( ( RANDOM % 60000 )  + 1025 ))
-        CHECK=$(sudo netstat -ap | grep $port)
+        port=$(( ( RANDOM % 40000 )  + 20000 ))
+        CHECK=$(netstat -a | grep $port)
     done
     echo $port
 }
@@ -79,7 +79,7 @@ if [ -z "$CUDA_VISIBLE_DEVICES" ]
 then
     num_gpu=0
 else
-    num_gpu=$CUDA_VISIBLE_DEVICES
+    num_gpu=`echo $CUDA_VISIBLE_DEVICES | tr , ' ' | wc -w`
 fi
 
 #Assumption only one head node and more than one 
@@ -103,8 +103,7 @@ fi
 
 num_cpu_for_head=${associative[$head_node]}
 
-command_launch="blaunch -z ${hosts[0]} ray start --head --port $port --dashboard-port $dashboard_port --object-store-memory $object_store_mem"
-
+command_launch="blaunch -z ${hosts[0]} ray start --head --port $port --dashboard-port $dashboard_port --num-cpus $num_cpu_for_head --num-gpus $num_gpu --object-store-memory $object_store_mem"
 
 $command_launch &
 
@@ -131,8 +130,7 @@ do
 
     sleep 10
     num_cpu=${associative[$host]}
-    #command_for_worker="blaunch -z $host ray  start --address $head_node:$port --num-cpus $num_cpu --num-gpus $num_gpu --object-store-memory $object_store_mem"
-    command_for_worker="blaunch -z $host ray  start --address $head_node:$port  --object-store-memory $object_store_mem"
+    command_for_worker="blaunch -z $host ray  start --address $head_node:$port --num-cpus $num_cpu --num-gpus $num_gpu --object-store-memory $object_store_mem"
     
     
     $command_for_worker &
