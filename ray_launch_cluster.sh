@@ -81,14 +81,6 @@ for host in ${!associative[@]}; do
     echo host=$host cores=${associative[$host]}
 done
 
-num_gpu=0
-if [ -z "$CUDA_VISIBLE_DEVICES" ]
-then
-    num_gpu=0
-else
-    num_gpu=`echo $CUDA_VISIBLE_DEVICES | tr , ' ' | wc -w`
-fi
-
 #Assumption only one head node and more than one 
 #workers will connect to head node
 
@@ -110,7 +102,7 @@ fi
 
 num_cpu_for_head=${associative[$head_node]}
 
-command_launch="blaunch -z ${hosts[0]} ray start --head --port $port --dashboard-port $dashboard_port --num-cpus $num_cpu_for_head --num-gpus $num_gpu --object-store-memory $object_store_mem"
+command_launch="blaunch -z ${hosts[0]} ray start --head --port $port --dashboard-port $dashboard_port --num-cpus $num_cpu_for_head --object-store-memory $object_store_mem"
 
 $command_launch &
 
@@ -137,7 +129,7 @@ do
 
     sleep 10
     num_cpu=${associative[$host]}
-    command_for_worker="blaunch -z $host ray  start --address $head_node:$port --num-cpus $num_cpu --num-gpus $num_gpu --object-store-memory $object_store_mem"
+    command_for_worker="blaunch -z $host ray  start --address $head_node:$port --num-cpus $num_cpu --object-store-memory $object_store_mem"
     
     
     $command_for_worker &
