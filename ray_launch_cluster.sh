@@ -2,6 +2,14 @@
 #Run ray on LSF.
 #eg:bsub -n 2 -R "span[ptile=1] rusage[mem=4GB]" -o std.out%J -e std.out%J bash -i ray_launch_cluster.sh
 
+echo "LSB_MCPU_HOSTS=$LSB_MCPU_HOSTS"
+echo "---- LSB_AFFINITY_HOSTFILE=$LSB_AFFINITY_HOSTFILE"
+cat $LSB_AFFINITY_HOSTFILE
+echo "---- End of LSB_AFFINITY_HOSTFILE"
+echo "---- LSB_DJOB_HOSTFILE=$LSB_DJOB_HOSTFILE"
+cat $LSB_DJOB_HOSTFILE
+echo "---- End of LSB_DJOB_HOSTFILE"
+
 #bias to selection of higher range ports
 function getfreeport()
 {
@@ -42,36 +50,35 @@ else
     conda activate $conda_env
 fi
 
-
 hosts=()
 for host in `cat $LSB_DJOB_HOSTFILE | uniq`
 do
-        echo "Adding host: " $host
+        echo "Adding host: $host"
         hosts+=($host)
 done
 
-echo "The host list is: " "${hosts[@]}"
+echo "The host list is: ${hosts[@]}"
 
 port=$(getfreeport)
-echo "Head node will use port: " $port
+echo "Head node will use port: $port"
 
 export port
 
 dashboard_port=$(getfreeport)
-echo "Dashboard will use port: " $dashboard_port
+echo "Dashboard will use port: $dashboard_port"
 
-
-echo "Num cpus per host is:" $LSB_MCPU_HOSTS
-IFS=' ' read -r -a array <<< "$LSB_MCPU_HOSTS"
+# Format of each line in file $LSB_AFFINITY_HOSTFILE:
+#   host_name cpu_id_list NUMA_node_id_list memory_policy
+# cpu_id_list is comma separeted numbers.
 declare -A associative
-i=0
-len=${#array[@]}
-while [ $i -lt $len ]
+while read -a line
 do
-    key=${array[$i]}
-    value=${array[$i+1]}
-    associative[$key]+=$value
-    i=$((i=i+2))
+    host=${line[0]}
+    num_cpu=`echo ${line[1]} | tr , ' ' | wc -w`
+    ((associative[$host]+=$num_cpu))
+done < $LSB_AFFINITY_HOSTFILE
+for host in ${!associative[@]}; do
+    echo host=$host cores=${associative[$host]}
 done
 
 num_gpu=0
@@ -91,7 +98,7 @@ export head_node
 
 echo "Object store memory for the cluster is set to 4GB"
 
-echo "Starting ray head node on: " ${hosts[0]}
+echo "Starting ray head node on: ${hosts[0]}"
 
 if [ -z $object_store_mem ]
 then
@@ -126,7 +133,7 @@ echo "adding the workers to head node: " "${workers[*]}"
 #run ray on worker nodes and connect to head
 for host in "${workers[@]}"
 do
-    echo "starting worker on: " $host "and using master node: " $head_node
+    echo "starting worker on: $host and using master node: $head_node"
 
     sleep 10
     num_cpu=${associative[$host]}
@@ -144,12 +151,12 @@ done
 
 #Run workload
 #eg of user workload python sample_code_for_ray.py
-echo "Running user workload: " $user_command 
+echo "Running user workload: $user_command"
 $user_command
 
 
 if [ $? != 0 ]; then
-    echo "Failure: " $?
+    echo "Failure: $?"
     exit $?
 else
     echo "Done"
